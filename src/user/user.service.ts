@@ -1,18 +1,19 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
 import { User } from './entities/user.entity';
 import { DataBaseService } from '../data-base/data-base.service';
 import { HelpersService } from '../helpers/helpers.service';
 import { omit } from 'lodash';
+import { ForbiddenException } from '@nestjs/common/exceptions/forbidden.exception';
 
 @Injectable()
 export class UserService {
   constructor(private db: DataBaseService) {}
 
   create(createUserDto: CreateUserDto) {
-    const user = new User(createUserDto);
     try {
+      const user = new User(createUserDto);
       this.db.users.set(user.id, user);
       return omit(user, 'password');
     } catch (e) {
@@ -37,15 +38,18 @@ export class UserService {
 
   async update(
     id: string,
-    updateUserDto: UpdateUserDto,
+    updateUserDto: UpdateUserPasswordDto,
   ): Promise<Omit<User, 'password'>> {
     const foundUser = await this.findOne(id);
     if (!foundUser) {
       throw new HttpException('Not found', HttpStatus.NOT_FOUND);
     }
+    if (updateUserDto.oldPassword !== foundUser.password) {
+      throw new ForbiddenException('Wrong password');
+    }
     const user = {
       ...foundUser,
-      ...updateUserDto,
+      password: updateUserDto.newPassword,
     };
     user.updatedAt = Date.now();
     user.version += 1;
@@ -53,7 +57,11 @@ export class UserService {
     return omit(user, 'password');
   }
 
-  async remove(userId: string): Promise<void> {
-    this.db.users.delete(userId);
+  async remove(id: string): Promise<void> {
+    const foundUser = await this.findOne(id);
+    if (!foundUser) {
+      throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+    }
+    this.db.users.delete(id);
   }
 }
