@@ -3,6 +3,7 @@ import {
   Injectable,
   ArgumentMetadata,
   BadRequestException,
+  NotFoundException,
 } from '@nestjs/common';
 import { validate } from 'class-validator';
 import { plainToInstance } from 'class-transformer';
@@ -31,5 +32,25 @@ export class ValidationPipe implements PipeTransform {
   private toValidate(metatype: TOneOfType): boolean {
     const types: TOneOfType[] = [String, Boolean, Number, Array, Object];
     return !types.includes(metatype);
+  }
+}
+
+@Injectable()
+export class ValidationNameParam implements PipeTransform {
+  method: string = '';
+  private readonly _possibleValues = ['track', 'album', 'artist'];
+
+  constructor(data: { method: 'POST' | 'DELETE' }) {
+    if (data?.method) {
+      this.method = data.method;
+    }
+  }
+  transform(value: string, metadata: ArgumentMetadata) {
+    const isNamesIncludesValue = this._possibleValues.includes(value);
+
+    if (!isNamesIncludesValue) {
+      throw new NotFoundException(`Cannot ${this.method} wrong path`);
+    }
+    return value;
   }
 }

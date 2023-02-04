@@ -73,8 +73,7 @@ export class AlbumService {
       foundData.id,
       'tracks',
     );
-    // eslint-disable-next-line no-console
-    console.log('foundTrack =>', foundTrack);
+
     if (foundTrack) {
       await this.trackService.update(foundTrack.id, { albumId: null });
     }
