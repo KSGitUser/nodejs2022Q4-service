@@ -9,11 +9,11 @@ import { HelpersService } from '../helpers/helpers.service';
 export class TrackService {
   constructor(private db: DataBaseService) {}
 
-  create(createTrackDto: CreateTrackDto) {
+  async create(createTrackDto: CreateTrackDto) {
     try {
       let foundArtist;
       if (createTrackDto.artistId) {
-        foundArtist = this.db.findOneByParam<string>(
+        foundArtist = await this.db.findOneByParam<string>(
           'id',
           createTrackDto.artistId,
           'artists',
@@ -23,7 +23,7 @@ export class TrackService {
         }
       }
       if (createTrackDto.albumId) {
-        foundArtist = this.db.findOneByParam<string>(
+        foundArtist = await this.db.findOneByParam<string>(
           'id',
           createTrackDto.albumId,
           'albums',
@@ -73,6 +73,10 @@ export class TrackService {
     const foundTrack = await this.findOne(id);
     if (!foundTrack) {
       throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+    }
+    const foundFavorite = await this.db.favorites.tracks.get(id);
+    if (foundFavorite) {
+      this.db.favorites.tracks.delete(id);
     }
     this.db.tracks.delete(id);
   }

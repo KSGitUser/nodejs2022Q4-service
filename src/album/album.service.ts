@@ -13,21 +13,21 @@ export class AlbumService {
     private trackService: TrackService,
   ) {}
 
-  create(createAlbumDto: CreateAlbumDto) {
+  async create(createAlbumDto: CreateAlbumDto) {
     try {
       let foundArtist;
       if (createAlbumDto.artistId) {
-        foundArtist = this.db.findOneByParam<string>(
+        foundArtist = await this.db.findOneByParam<string>(
           'id',
           createAlbumDto.artistId,
           'artists',
         );
-        if (!foundArtist.id) {
+        if (!foundArtist?.id) {
           createAlbumDto.artistId = null;
         }
       }
       const createdAlbum = new Album(createAlbumDto);
-      this.db.albums.set(createdAlbum.id, createdAlbum);
+      await this.db.albums.set(createdAlbum.id, createdAlbum);
       return createdAlbum;
     } catch (e) {
       throw new HttpException('Bad request', HttpStatus.BAD_REQUEST);
@@ -73,9 +73,12 @@ export class AlbumService {
       foundData.id,
       'tracks',
     );
-
     if (foundTrack) {
       await this.trackService.update(foundTrack.id, { albumId: null });
+    }
+    const foundFavorite = await this.db.favorites.albums.get(id);
+    if (foundFavorite) {
+      this.db.favorites.albums.delete(id);
     }
     this.db.albums.delete(id);
   }

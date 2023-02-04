@@ -70,6 +70,10 @@ export class ArtistService {
     if (foundAlbum) {
       await this.albumService.update(foundAlbum.id, { artistId: null });
     }
+    const foundFavorite = await this.db.favorites.artists.get(id);
+    if (foundFavorite) {
+      this.db.favorites.artists.delete(id);
+    }
     this.db.artists.delete(id);
   }
 }
