@@ -1,32 +1,32 @@
 import {
-  Body,
   Controller,
-  Delete,
   Get,
-  HttpCode,
-  HttpStatus,
-  Param,
-  ParseUUIDPipe,
   Post,
+  Body,
+  Param,
+  Delete,
+  ParseUUIDPipe,
+  HttpStatus,
   Put,
+  HttpCode,
 } from '@nestjs/common';
-import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
+import { ArtistService } from './artist.service';
+import { CreateArtistDto } from './dto/create-artist.dto';
+import { UpdateArtistDto } from './dto/update-artist.dto';
 import { ValidationPipe } from '../pipes/validator.pipe';
 
-@Controller('user')
-export class UserController {
-  constructor(private readonly usersService: UserService) {}
+@Controller('artist')
+export class ArtistController {
+  constructor(private readonly artistService: ArtistService) {}
 
   @Post()
-  create(@Body(new ValidationPipe()) createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  create(@Body(new ValidationPipe()) createArtistDto: CreateArtistDto) {
+    return this.artistService.create(createArtistDto);
   }
 
   @Get()
   findAll() {
-    return this.usersService.findAll();
+    return this.artistService.findAll();
   }
 
   @Get(':id')
@@ -40,7 +40,7 @@ export class UserController {
     )
     id: string,
   ) {
-    return this.usersService.findOne(id);
+    return this.artistService.findOne(id);
   }
 
   @Put(':id')
@@ -53,9 +53,9 @@ export class UserController {
       }),
     )
     id: string,
-    @Body(new ValidationPipe()) updateUserPasswordDto: UpdateUserPasswordDto,
+    @Body(new ValidationPipe()) updateArtistDto: UpdateArtistDto,
   ) {
-    return this.usersService.update(id, updateUserPasswordDto);
+    return this.artistService.update(id, updateArtistDto);
   }
 
   @Delete(':id')
@@ -70,6 +70,6 @@ export class UserController {
     )
     id: string,
   ) {
-    return this.usersService.remove(id);
+    return this.artistService.remove(id);
   }
 }

@@ -16,6 +16,7 @@
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest --config ./test/jest-e2e.json",
     "test:users": "jest --config ./test/jest-e2e.json -i ./test/users.e2e.spec.ts",
+    "test:artists": "jest --config ./test/jest-e2e.json -i ./test/artists.e2e.spec.ts",
     "test:auth": "cross-env TEST_MODE=auth jest --config ./test/jest-e2e.json",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",

@@ -4,7 +4,6 @@ import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
 import { User } from './entities/user.entity';
 import { DataBaseService } from '../data-base/data-base.service';
 import { HelpersService } from '../helpers/helpers.service';
-import { omit } from 'lodash';
 import { ForbiddenException } from '@nestjs/common/exceptions/forbidden.exception';
 
 @Injectable()
@@ -15,7 +14,7 @@ export class UserService {
     try {
       const user = new User(createUserDto);
       this.db.users.set(user.id, user);
-      return omit(user, 'password');
+      return user;
     } catch (e) {
       throw new HttpException('Bad request', HttpStatus.BAD_REQUEST);
     }
@@ -47,14 +46,11 @@ export class UserService {
     if (updateUserDto.oldPassword !== foundUser.password) {
       throw new ForbiddenException('Wrong password');
     }
-    const user = {
-      ...foundUser,
-      password: updateUserDto.newPassword,
-    };
-    user.updatedAt = Date.now();
-    user.version += 1;
-    this.db.users.set(user.id, { ...user });
-    return omit(user, 'password');
+    foundUser.password = updateUserDto.newPassword;
+    foundUser.updatedAt = Date.now();
+    foundUser.version += 1;
+    this.db.users.set(foundUser.id, foundUser);
+    return foundUser;
   }
 
   async remove(id: string): Promise<void> {
