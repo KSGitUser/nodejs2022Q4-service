@@ -5,10 +5,14 @@ import { Artist } from './entities/artist.entity';
 import { DataBaseService } from '../data-base/data-base.service';
 import { HelpersService } from '../helpers/helpers.service';
 import { merge } from 'lodash/fp';
+import { TrackService } from '../track/track.service';
 
 @Injectable()
 export class ArtistService {
-  constructor(private db: DataBaseService) {}
+  constructor(
+    private db: DataBaseService,
+    private trackService: TrackService,
+  ) {}
   create(createArtistDto: CreateArtistDto) {
     return HelpersService.createDbRecord(
       Artist,
@@ -44,6 +48,14 @@ export class ArtistService {
     const foundData = await this.findOne(id);
     if (!foundData) {
       throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+    }
+    const foundTrack = await this.db.findOneByParam<string>(
+      'artistId',
+      foundData.id,
+      'tracks',
+    );
+    if (foundTrack) {
+      await this.trackService.remove(foundTrack.id);
     }
     this.db.artists.delete(id);
   }
