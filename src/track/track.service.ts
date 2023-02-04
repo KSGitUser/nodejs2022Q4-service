@@ -2,8 +2,8 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { DataBaseService } from '../data-base/data-base.service';
 import { Track } from './entities/track.entity';
-import { merge } from 'lodash/fp';
 import { UpdateTrackDto } from './dto/update-track.dto';
+import { HelpersService } from '../helpers/helpers.service';
 
 @Injectable()
 export class TrackService {
@@ -20,6 +20,16 @@ export class TrackService {
         );
         if (!foundArtist.id) {
           createTrackDto.artistId = null;
+        }
+      }
+      if (createTrackDto.albumId) {
+        foundArtist = this.db.findOneByParam<string>(
+          'id',
+          createTrackDto.albumId,
+          'albums',
+        );
+        if (!foundArtist.id) {
+          createTrackDto.albumId = null;
         }
       }
       const createdTrack = new Track(createTrackDto);
@@ -43,19 +53,23 @@ export class TrackService {
   }
 
   async update(
-    id: string,
+    id: Track['id'],
     updateTrackDto: UpdateTrackDto,
-  ): Promise<Omit<Track, 'password'>> {
+  ): Promise<Track> {
     const foundTrack = await this.findOne(id);
     if (!foundTrack) {
       throw new HttpException('Not found', HttpStatus.NOT_FOUND);
     }
-    const updatedData = merge(foundTrack, updateTrackDto);
-    this.db.artists.set(id, updatedData);
+    const updatedData = HelpersService.updateData(
+      foundTrack,
+      updateTrackDto,
+      id,
+    );
+    this.db.tracks.set(id, { ...updatedData, id });
     return updatedData;
   }
 
-  async remove(id: string): Promise<void> {
+  async remove(id: Track['id']): Promise<void> {
     const foundTrack = await this.findOne(id);
     if (!foundTrack) {
       throw new HttpException('Not found', HttpStatus.NOT_FOUND);

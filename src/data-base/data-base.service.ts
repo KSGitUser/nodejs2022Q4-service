@@ -2,17 +2,20 @@ import { Injectable } from '@nestjs/common';
 import { User } from '../user/entities/user.entity';
 import { Artist } from '../artist/entities/artist.entity';
 import { Track } from '../track/entities/track.entity';
+import { Album } from '../album/entities/album.entity';
 
 @Injectable()
 export class DataBaseService {
   users: Map<string, User>;
   artists: Map<string, Artist>;
   tracks: Map<string, Track>;
+  albums: Map<string, Album>;
 
   constructor() {
     this.users = new Map();
     this.artists = new Map();
     this.tracks = new Map();
+    this.albums = new Map();
   }
 
   findAll(dbInstanceName: keyof DataBaseService) {

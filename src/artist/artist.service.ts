@@ -4,14 +4,15 @@ import { UpdateArtistDto } from './dto/update-artist.dto';
 import { Artist } from './entities/artist.entity';
 import { DataBaseService } from '../data-base/data-base.service';
 import { HelpersService } from '../helpers/helpers.service';
-import { merge } from 'lodash/fp';
 import { TrackService } from '../track/track.service';
+import { AlbumService } from '../album/album.service';
 
 @Injectable()
 export class ArtistService {
   constructor(
     private db: DataBaseService,
     private trackService: TrackService,
+    private albumService: AlbumService,
   ) {}
   create(createArtistDto: CreateArtistDto) {
     return HelpersService.createDbRecord(
@@ -39,8 +40,12 @@ export class ArtistService {
     if (!foundData) {
       throw new HttpException('Not found', HttpStatus.NOT_FOUND);
     }
-    const updatedData = merge(foundData, updateArtistDto);
-    this.db.users.set(id, updatedData);
+    const updatedData = HelpersService.updateData(
+      foundData,
+      updateArtistDto,
+      id,
+    );
+    this.db.artists.set(id, updatedData);
     return updatedData;
   }
 
@@ -55,7 +60,15 @@ export class ArtistService {
       'tracks',
     );
     if (foundTrack) {
-      await this.trackService.remove(foundTrack.id);
+      await this.trackService.update(foundTrack.id, { artistId: null });
+    }
+    const foundAlbum = await this.db.findOneByParam<string>(
+      'artistId',
+      foundData.id,
+      'albums',
+    );
+    if (foundAlbum) {
+      await this.albumService.update(foundAlbum.id, { artistId: null });
     }
     this.db.artists.delete(id);
   }

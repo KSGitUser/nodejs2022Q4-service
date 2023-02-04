@@ -6,6 +6,7 @@ import {
 } from 'uuid';
 import { DataBaseService } from '../data-base/data-base.service';
 import { IHasId, Instantiable } from './types';
+import { merge, keys, pick } from 'lodash/fp';
 
 @Injectable()
 export class HelpersService {
@@ -15,6 +16,13 @@ export class HelpersService {
 
   static isValidateUUID(uuidId: string): boolean {
     return uuidValidate(uuidId) && uuidVersion(uuidId) === 4;
+  }
+
+  static updateData(target, source, id) {
+    const pickedData = pick(keys(target), source);
+    const mergedData = merge(target, pickedData);
+    mergedData.id = id;
+    return mergedData;
   }
 
   /**

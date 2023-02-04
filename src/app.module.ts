@@ -7,6 +7,7 @@ import { HelpersService } from './helpers/helpers.service';
 import { HelpersModule } from './helpers/helpers.module';
 import { ArtistModule } from './artist/artist.module';
 import { TrackModule } from './track/track.module';
+import { AlbumModule } from './album/album.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { TrackModule } from './track/track.module';
     HelpersModule,
     ArtistModule,
     TrackModule,
+    AlbumModule,
   ],
   controllers: [AppController],
   providers: [AppService, HelpersService],
