@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import 'dotenv/config';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 const port = process.env.PORT || 4000;
 
@@ -14,6 +15,16 @@ async function bootstrap() {
       whitelist: true,
     }),
   );
+
+  const config = new DocumentBuilder()
+    .setTitle('Home library')
+    .setDescription('Rest API for home library')
+    .setVersion('0.0.1')
+    .addTag('home_library')
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('swagger', app, document);
+
   await app.listen(port, () => console.log(messageOnServerStart));
 }
 bootstrap();
