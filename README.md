@@ -17,6 +17,15 @@ git clone {repository URL}
 npm install
 ```
 
+## Environments
+
+By default server is using port 4000. If you would like to use a custom post you can tun command
+
+```javascript
+cp .env.example .env
+```
+It will create `.env` file from `.env.example` file. Inside it you can change PORT variable.
+
 ## Running application
 
 ```
@@ -70,3 +79,6 @@ npm run format
 Press <kbd>F5</kbd> to debug.
 
 For more information, visit: https://code.visualstudio.com/docs/editor/debugging
+
+
+
