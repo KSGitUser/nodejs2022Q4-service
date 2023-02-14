@@ -1,9 +1,14 @@
-FROM node:14.20.0-alpine3.16 as node
+# Use a minimal base image
+FROM node:18-alpine
 
-WORKDIR /usr/src/app
+# Set the working directory to the app directory
+WORKDIR /app
 
-COPY  package*.json ./
+COPY package*.json .
 
-RUN npm install
+# Install the dependencies
+#RUN apk add --no-cache nodejs npm
+RUN #npm install
 
-COPY --chown=node:node ./ ./
+# Copy the application code into the container
+COPY . .

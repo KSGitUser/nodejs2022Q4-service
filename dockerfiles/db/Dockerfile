@@ -1,1 +1,1 @@
-FROM postgres as DB
+FROM postgres:14-alpine as DB
