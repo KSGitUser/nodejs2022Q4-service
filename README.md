@@ -8,7 +8,7 @@
 ## Downloading
 
 ```
-git clone {repository URL}
+git clone https://github.com/KSGitUser/nodejs2022Q4-service.git
 ```
 
 ## Installing NPM modules
@@ -16,6 +16,16 @@ git clone {repository URL}
 ```
 npm install
 ```
+
+## Environments
+
+By default the server is using on port 4000. If you would like to use a custom post you can run the command
+
+```javascript
+cp .env.example .env
+```
+It will create `.env` file from `.env.example` file. Inside it you can change PORT variable.
+Or you can create it manually
 
 ## Running application
 
@@ -37,7 +47,8 @@ To run all tests without authorization
 npm run test
 ```
 
-To run only one of all test suites
+To run only one of all test suites. If you will see an error, please, check that 
+the server war run in section `Running application` .
 
 ```
 npm run test -- <path to suite>
@@ -70,3 +81,9 @@ npm run format
 Press <kbd>F5</kbd> to debug.
 
 For more information, visit: https://code.visualstudio.com/docs/editor/debugging
+
+
+### Swagger - API
+On address http://localhost:4000/swagger/, after start server, you can try and see swagger for API
+
+
