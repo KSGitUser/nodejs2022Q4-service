@@ -17,6 +17,8 @@ services:
     ports:
       - published: 8002
         target: 5432
+    volumes:
+      - postgres-db:/var/lib/postgresql/data
     restart: always
 
   server:
@@ -36,6 +38,9 @@ services:
     ports:
       - "4000:4000"
     restart: always
+
+volumes:
+  postgres-db:   
 
 version: '3.9'
 
