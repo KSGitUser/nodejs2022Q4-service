@@ -15,7 +15,7 @@ services:
     networks:
       - my-network
     ports:
-      - published: 8002
+      - published: ${DB_PUBLISHED_PORT}
         target: 5432
     volumes:
       - postgres-db:/var/lib/postgresql/data
@@ -28,9 +28,10 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: nodejs-rs-server  
+    container_name: nodejs-rs-server
     environment:
       PORT: ${PORT}
+      DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:${DB_PUBLISHED_PORT}/${POSTGRES_DB}?schema=public"
     volumes:
       - ./:/app
     networks:
