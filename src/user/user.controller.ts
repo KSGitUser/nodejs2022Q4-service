@@ -20,13 +20,14 @@ export class UserController {
   constructor(private readonly usersService: UserService) {}
 
   @Post()
+  @HttpCode(201)
   create(@Body(new ValidationPipe()) createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
 
   @Get()
   findAll() {
-    return this.usersService.findAll();
+    return this.usersService.findAll({});
   }
 
   @Get(':id')

@@ -15,8 +15,8 @@ RUN npm config set fetch-retries 5
 RUN npm config set fetch-retry-mintimeout 600000
 RUN npm config set fetch-retry-maxtimeout 1200000
 RUN npm config set fetch-timeout 1800000
-RUN ["npm", "ci", "--maxsockets", "6"]
+RUN ["npm", "ci", "--maxsockets", "4"]
 
 COPY . .
 
-CMD ["npm", "run", "start:dev"]
+CMD ["npm", "run", "start:app"]

@@ -3,6 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  binaryTargets = ["native"]
 }
 
 datasource db {
@@ -11,9 +12,12 @@ datasource db {
 }
 
 model User {
-  id       String  @id @unique @default(uuid())
-  login    String  @unique
-  password String?
+  id         String  @id @unique @default(uuid())
+  login      String  
+  password   String
+  version    Int?
+  createdAt  Float?
+  updatedAt  Float?
 }
 
 model Track {
@@ -32,8 +36,8 @@ model Artist {
   name      String
   grammy    Boolean    @default(false)
   favorites Favorite[]
-  Track     Track[]
-  Album     Album[]
+  tracks     Track[]
+  albums     Album[]
 }
 
 model Album {
@@ -43,7 +47,7 @@ model Album {
   artist    Artist?    @relation(fields: [artistId], references: [id])
   artistId  String?
   favorites Favorite[]
-  Track     Track[]
+  tracks     Track[]
 }
 
 model Favorite {
