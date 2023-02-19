@@ -1,5 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { DataBaseService } from '../data-base/data-base.service';
+import { PrismaService } from 'src/prisma/prisma.service';
+
+const favoriteId = '99999999-14b8-4b41-80c1-49a5c82d7538';
 
 const DB_CATEGORY_NAMES = {
   album: 'albums',
@@ -9,39 +11,66 @@ const DB_CATEGORY_NAMES = {
 
 @Injectable()
 export class FavoriteService {
-  constructor(private db: DataBaseService) {}
+  constructor(private prisma: PrismaService) {}
   async create(categoryName: string, id: string) {
-    if (!this.db.favorites[DB_CATEGORY_NAMES[categoryName]]) {
+    if (!DB_CATEGORY_NAMES[categoryName]) {
       return new HttpException('Bad request', HttpStatus.BAD_REQUEST);
     }
-    const foundData = await this.db[DB_CATEGORY_NAMES[categoryName]].get(id);
+    const foundData = await this.prisma[categoryName].findUnique({
+      where: { id },
+    });
     if (!foundData) {
       throw new HttpException(
         'Not found entity',
         HttpStatus.UNPROCESSABLE_ENTITY,
       );
     }
-    try {
-      await this.db.favorites[DB_CATEGORY_NAMES[categoryName]].set(id, id);
-      return foundData;
-    } catch (e) {
-      return new HttpException('Bad request', HttpStatus.BAD_REQUEST);
+    const foundFavorite = this.prisma.favorite.findUnique({
+      where: { id: favoriteId },
+    });
+
+    if (!foundFavorite) {
+      return await this.prisma.favorite.create({
+        data: {
+          id: favoriteId,
+          [DB_CATEGORY_NAMES[categoryName]]: {
+            connect: { id: id },
+          },
+        },
+      });
     }
+    return await this.prisma.favorite.update({
+      where: { id: favoriteId },
+      data: {
+        [DB_CATEGORY_NAMES[categoryName]]: {
+          connect: { id: id },
+        },
+      },
+    });
   }
 
   async findAll() {
-    return await this.db.getAllFavorites();
+    return await this.prisma.favorite.findUnique({
+      where: { id: favoriteId },
+      include: {
+        artists: true,
+        tracks: true,
+        albums: true,
+      },
+    });
   }
 
-  remove(categoryName: string, id: string) {
-    if (!this.db.favorites[DB_CATEGORY_NAMES[categoryName]]) {
+  async remove(categoryName: string, id: string) {
+    if (!DB_CATEGORY_NAMES[categoryName]) {
       return new HttpException('Bad request', HttpStatus.BAD_REQUEST);
     }
-    const foundInFavorites =
-      this.db.favorites[DB_CATEGORY_NAMES[categoryName]].get(id);
-    if (!foundInFavorites) {
-      throw new HttpException('Not found', HttpStatus.NOT_FOUND);
-    }
-    this.db.favorites[DB_CATEGORY_NAMES[categoryName]].delete(id);
+    return await this.prisma.favorite.update({
+      where: { id: favoriteId },
+      data: {
+        [DB_CATEGORY_NAMES[categoryName]]: {
+          disconnect: { id: id },
+        },
+      },
+    });
   }
 }
