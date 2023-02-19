@@ -26,7 +26,7 @@ export class ArtistController {
 
   @Get()
   findAll() {
-    return this.artistService.findAll();
+    return this.artistService.findAll({});
   }
 
   @Get(':id')
