@@ -86,4 +86,30 @@ For more information, visit: https://code.visualstudio.com/docs/editor/debugging
 ### Swagger - API
 On address http://localhost:4000/swagger/, after start server, you can try and see swagger for API
 
+### Db
+
+All envirenments should be in `.env` file. You should use `.env.exampe` - rename in or use a command
+```
+cp .env.exampe .env
+```
+
+## Docker, docker-compose
+
+To start APP using Docker be sure than docker desktop is running on your computer.
+After cloning repository and adding the `.env` file run the command
+
+```
+docker-compose build
+```
+
+then run comand to start app
+
+```
+docker-compose up
+```
+
+Server by default will start on `4000` port 
+You can check API using command `npm run test`
+
+
 
