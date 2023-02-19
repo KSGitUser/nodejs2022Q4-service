@@ -7,6 +7,7 @@ import { HelpersService } from '../helpers/helpers.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ArtistService } from 'src/artist/artist.service';
 import { AlbumService } from 'src/album/album.service';
+import { favoriteId } from "./../helpers/consts"
 
 @Injectable()
 export class TrackService {
@@ -117,10 +118,14 @@ export class TrackService {
     if (!foundTrack) {
       throw new HttpException('Not found', HttpStatus.NOT_FOUND);
     }
-    // const foundFavorite = await this.db.favorites.tracks.get(id);
-    // if (foundFavorite) {
-    //   this.db.favorites.tracks.delete(id);
-    // }
+    await this.prisma.favorite.update({
+      where: { id: favoriteId },
+      data: {
+        tracks: {
+          disconnect: { id: id },
+        },
+      },
+    });
     await this.prisma.track.delete({where: {id}});
   }
 }

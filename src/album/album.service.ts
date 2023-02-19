@@ -7,6 +7,7 @@ import { TrackService } from '../track/track.service';
 import { HelpersService } from '../helpers/helpers.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Prisma } from '@prisma/client';
+import { favoriteId } from 'src/helpers/consts';
 
 @Injectable()
 export class AlbumService {
@@ -95,14 +96,17 @@ export class AlbumService {
         }
       }
     });
-    //:TODO добавить правки в удаления после того как будет готовы все сервисы
-    // if (foundTrack) {
-    //   await this.trackService.update(foundTrack.id, { albumId: null });
-    // }
-    // const foundFavorite = await this.db.favorites.albums.get(id);
-    // if (foundFavorite) {
-    //   this.db.favorites.albums.delete(id);
-    // }
+    if (foundTrack) {
+      await this.trackService.update(foundTrack.id, { albumId: null });
+    }
+    await this.prisma.favorite.update({
+      where: { id: favoriteId },
+      data: {
+        tracks: {
+          disconnect: { id: id },
+        },
+      },
+    });
     await this.prisma.album.delete({ where: {id}});
   }
 }

@@ -83,8 +83,6 @@ export class UserService {
       where: {id},
     });
 
-    console.log('updatedUser =>', updatedUser);
-
     return omit(updatedUser, 'password');
   }
 

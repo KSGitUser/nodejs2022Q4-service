@@ -8,11 +8,14 @@ import { TrackService } from '../track/track.service';
 import { AlbumService } from '../album/album.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Prisma } from '@prisma/client';
+import { favoriteId } from 'src/helpers/consts';
 
 @Injectable()
 export class ArtistService {
   constructor(
     private prisma: PrismaService,
+    private trackService: TrackService,
+    private albumService: AlbumService
   ) {}
   // create(createArtistDto: CreateArtistDto) {
   //   return HelpersService.createDbRecord(
@@ -148,25 +151,28 @@ export class ArtistService {
         equals: foundArtistRecord.id,
       }},
     })
-    // if (foundTrack) {
-    //   await this.trackService.update(foundTrack.id, { artistId: null });
-    // }
-    //     const foundAlbum = await this.prisma.album.findFirst
-    //     (
-    //       {
-    //         where: { artistId: {
-    //           equals: foundArtistRecord.id,
-    //         }},
-    //       }
-    // );
-  //   if (foundAlbum) {
-  //     await this.albumService.update(foundAlbum.id, { artistId: null });
-  //   }
-  //:TODO иправить поиск в favorites
-    // const foundFavorite = await this.db.favorites.artists.get(id);
-    // if (foundFavorite) {
-    //   this.db.favorites.artists.delete(id);
-    // }
+    if (foundTrack) {
+      await this.trackService.update(foundTrack.id, { artistId: null });
+    }
+        const foundAlbum = await this.prisma.album.findFirst
+        (
+          {
+            where: { artistId: {
+              equals: foundArtistRecord.id,
+            }},
+          }
+    );
+    if (foundAlbum) {
+      await this.albumService.update(foundAlbum.id, { artistId: null });
+    }
+    await this.prisma.favorite.update({
+      where: { id: favoriteId },
+      data: {
+        tracks: {
+          disconnect: { id: id },
+        },
+      },
+    });
     await  this.prisma.artist.delete({
       where: {id},
     });

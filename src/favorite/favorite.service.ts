@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { favoriteId } from "./../helpers/consts"
 
-const favoriteId = '99999999-14b8-4b41-80c1-49a5c82d7538';
 
 const DB_CATEGORY_NAMES = {
   album: 'albums',
