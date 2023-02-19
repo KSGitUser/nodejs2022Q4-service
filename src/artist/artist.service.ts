@@ -141,7 +141,7 @@ export class ArtistService {
   //   this.db.artists.delete(id);
   // }
 
-  async remove(id: Artist['id']) {
+  async remove(id: Artist['id']):Promise<void> {
     const foundArtistRecord = await this.findOne(id);
     if (!foundArtistRecord) {
       throw new HttpException('Not found', HttpStatus.NOT_FOUND);
@@ -170,7 +170,7 @@ export class ArtistService {
     // if (foundFavorite) {
     //   this.db.favorites.artists.delete(id);
     // }
-    return this.prisma.artist.delete({
+    await  this.prisma.artist.delete({
       where: {id},
     });
   }
