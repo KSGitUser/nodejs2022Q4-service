@@ -13,9 +13,6 @@ import { Prisma } from '@prisma/client';
 export class ArtistService {
   constructor(
     private prisma: PrismaService,
-    private db: DataBaseService,
-    private trackService: TrackService,
-    private albumService: AlbumService,
   ) {}
   // create(createArtistDto: CreateArtistDto) {
   //   return HelpersService.createDbRecord(

@@ -9,13 +9,11 @@ export class UpdateTrackDto extends PartialType(CreateTrackDto) {
   name?: string;
 
   @ApiProperty()
-  @IsEmpty()
   @IsString()
   artistId?: string | null; // refers to Artist
 
   @ApiProperty()
   @IsString()
-  @IsEmpty()
   albumId?: string | null; // refers to Album
 
   @ApiProperty()

@@ -4,53 +4,72 @@ import { DataBaseService } from '../data-base/data-base.service';
 import { Track } from './entities/track.entity';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { HelpersService } from '../helpers/helpers.service';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { ArtistService } from 'src/artist/artist.service';
+import { AlbumService } from 'src/album/album.service';
 
 @Injectable()
 export class TrackService {
-  constructor(private db: DataBaseService) {}
+  constructor(
+    private db: DataBaseService, 
+    private prisma: PrismaService, 
+    ) {}
 
-  async create(createTrackDto: CreateTrackDto) {
+  async create(createTrackDto: CreateTrackDto):Promise<Track> {
     try {
-      let foundArtist;
       if (createTrackDto.artistId) {
-        foundArtist = await this.db.findOneByParam<string>(
-          'id',
-          createTrackDto.artistId,
-          'artists',
-        );
+        const foundArtist = await this.prisma.artist.findUnique({where: {id: createTrackDto.artistId}})
         if (!foundArtist.id) {
           createTrackDto.artistId = null;
         }
       }
       if (createTrackDto.albumId) {
-        foundArtist = await this.db.findOneByParam<string>(
-          'id',
-          createTrackDto.albumId,
-          'albums',
-        );
-        if (!foundArtist.id) {
+        const foundAlbum = await this.prisma.album.findUnique({where: {id: createTrackDto.albumId}});
+        if (!foundAlbum.id) {
           createTrackDto.albumId = null;
         }
       }
       const createdTrack = new Track(createTrackDto);
-      this.db.tracks.set(createdTrack.id, createdTrack);
-      return createdTrack;
+      const createdDbRecord = this.prisma.track.create({
+        data: {...createdTrack },
+      });
+      return createdDbRecord;
     } catch (e) {
       throw new HttpException('Bad request', HttpStatus.BAD_REQUEST);
     }
   }
 
-  findAll(): Track[] {
-    return Array.from(this.db.tracks.values());
+  async findAll():Promise<Track[]> {
+    return await  this.prisma.track.findMany(); 
   }
 
-  async findOne(id: string): Promise<Track> {
-    const fondTrack = await this.db.tracks.get(id);
+  async findOne(id: Track['id']): Promise<Track> {
+    if (!HelpersService.isValidateUUID(id)) {
+      throw new HttpException('Forbidden', HttpStatus.BAD_REQUEST);
+    }
+    const fondTrack = await this.prisma.track.findUnique({where: {id}});
     if (!fondTrack) {
       throw new HttpException('Not found', HttpStatus.NOT_FOUND);
     }
     return fondTrack;
   }
+
+  // async update(
+  //   id: Track['id'],
+  //   updateTrackDto: UpdateTrackDto,
+  // ): Promise<Track> {
+  //   const foundTrack = await this.findOne(id);
+  //   if (!foundTrack) {
+  //     throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+  //   }
+  //   const updatedData = HelpersService.updateData(
+  //     foundTrack,
+  //     updateTrackDto,
+  //     id,
+  //   );
+  //   this.db.tracks.set(id, { ...updatedData, id });
+  //   return updatedData;
+  // }
 
   async update(
     id: Track['id'],
@@ -60,24 +79,48 @@ export class TrackService {
     if (!foundTrack) {
       throw new HttpException('Not found', HttpStatus.NOT_FOUND);
     }
+    if (updateTrackDto.artistId) {
+      const foundArtist = await this.prisma.artist.findUnique({where: {id: updateTrackDto.artistId}})
+      if (!foundArtist.id) {
+        updateTrackDto.artistId = null;
+      }
+    }
+    if (updateTrackDto.albumId) {
+      const foundAlbum = await this.prisma.album.findUnique({where: {id: updateTrackDto.albumId}});
+      if (!foundAlbum.id) {
+        updateTrackDto.albumId = null;
+      }
+    }
     const updatedData = HelpersService.updateData(
       foundTrack,
       updateTrackDto,
       id,
     );
-    this.db.tracks.set(id, { ...updatedData, id });
-    return updatedData;
+    const updatedDbRecord = this.prisma.track.update({ where: {id}, data: { ...updatedData, id }});
+    return updatedDbRecord;
   }
+
+  // async remove(id: Track['id']): Promise<void> {
+  //   const foundTrack = await this.findOne(id);
+  //   if (!foundTrack) {
+  //     throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+  //   }
+  //   const foundFavorite = await this.db.favorites.tracks.get(id);
+  //   if (foundFavorite) {
+  //     this.db.favorites.tracks.delete(id);
+  //   }
+  //   this.db.tracks.delete(id);
+  // }
 
   async remove(id: Track['id']): Promise<void> {
     const foundTrack = await this.findOne(id);
     if (!foundTrack) {
       throw new HttpException('Not found', HttpStatus.NOT_FOUND);
     }
-    const foundFavorite = await this.db.favorites.tracks.get(id);
-    if (foundFavorite) {
-      this.db.favorites.tracks.delete(id);
-    }
-    this.db.tracks.delete(id);
+    // const foundFavorite = await this.db.favorites.tracks.get(id);
+    // if (foundFavorite) {
+    //   this.db.favorites.tracks.delete(id);
+    // }
+    await this.prisma.track.delete({where: {id}});
   }
 }
