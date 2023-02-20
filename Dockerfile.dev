@@ -4,31 +4,21 @@ FROM node:18-alpine
 # Set the working directory to the app directory
 WORKDIR /app
 
-COPY package*.json .
+COPY package*.json ./
 COPY .npmrc .
 
-# Install the dependencies
-# RUN apk add --no-cache nodejs npm
-#RUN #npm install
+#Was a lot of errors SOCKET TIMEOUT - that's why I use next commands
 
-# RUN set -eux; apt-get install curl;
 RUN set -eux; apk add curl;
 
-# Copy the application code into the container
 RUN npm config set fetch-retries 5
 RUN npm config set fetch-retry-mintimeout 600000
 RUN npm config set fetch-retry-maxtimeout 1200000
 RUN npm config set fetch-timeout 1800000
-# RUN npm i -D -d jest typescript --maxsockets 6
-# RUN npm i -D -d ts-jest @types/jest
-# RUN npm install -g npm@latest
-# RUN ["npm", "install", "-d", "--maxsockets", "6"]
-RUN ["npm", "ci", "--maxsockets", "6"]
+RUN ["npm", "ci", "--maxsockets", "4"]
 
 
-# RUN npm install --save-dev prettier source-map-support supertest eslint eslint-config-prettier eslint-plugin-prettier @types/uuid @typescript-eslint/eslint-plugin @typescript-eslint/parser @types/jsonwebtoken @types/node @nestjs/cli @nestjs/schematics @nestjs/testing @types/bcrypt
-# RUN npm install -d --save-dev prettier source-map-support supertest eslint eslint-config-prettier eslint-plugin-prettier @types/uuid  @types/jsonwebtoken @types/node @nestjs/cli @nestjs/schematics @nestjs/testing @types/bcrypt
-# @typescript-eslint/eslint-plugin @typescript-eslint/parser
+
 COPY . .
 
-CMD ["npm", "run", "start:dev"]
+CMD ["npm", "run", "start:app"]

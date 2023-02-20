@@ -109,7 +109,19 @@ docker-compose up
 ```
 
 Server by default will start on `4000` port 
-You can check API using command `npm run test`
+Wait until you see 
+`nodejs-rs-server  | The Server was started at http://localhost:4000 `
+You can check API using command 
+```
+npm run test
+```
+
+### Check Vulnerabilities
+To check vulnerabilities run command
+
+```
+npm audit
+```
 
 
 

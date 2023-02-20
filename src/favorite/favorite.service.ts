@@ -52,7 +52,7 @@ export class FavoriteService {
   }
 
   async findAll() {
-    return await this.prisma.favorite.findUnique({
+    const foundFavorites = await this.prisma.favorite.findUnique({
       where: { id: favoriteId },
       include: {
         artists: true,
@@ -60,6 +60,7 @@ export class FavoriteService {
         albums: true,
       },
     });
+    return { ...{ albums: [], tracks: [], artists: [] }, ...foundFavorites };
   }
 
   async remove(categoryName: string, id: string) {
@@ -71,7 +72,15 @@ export class FavoriteService {
       where: { id: favoriteId },
       include: { [DB_CATEGORY_NAMES[categoryName]]: true },
     });
-    if (!favorite || !(favorite?.[DB_CATEGORY_NAMES[categoryName]] as Album[] | Track[] | Artist[]).some((record) => record.id === id)) {
+    if (
+      !favorite ||
+      !(
+        favorite?.[DB_CATEGORY_NAMES[categoryName]] as
+          | Album[]
+          | Track[]
+          | Artist[]
+      ).some((record) => record.id === id)
+    ) {
       return;
     }
     return await this.prisma.favorite.update({

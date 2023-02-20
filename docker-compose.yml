@@ -4,7 +4,7 @@ networks:
 
 services:
   db:
-    image: 'ksgituser/getting-started:rs-db'
+    image: "ksgituser/getting-started:rs-db"
     container_name: nodejs-rs-db  
     healthcheck:
       test: "exit 0" 
@@ -26,9 +26,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: "ksgituser/getting-started:rs-app-2"
     container_name: nodejs-rs-server
     environment:
       PORT: ${PORT}
