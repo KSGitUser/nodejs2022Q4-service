@@ -96,7 +96,7 @@ cp .env.exampe .env
 ## Docker, docker-compose
 To build app using two images from here: `https://hub.docker.com/r/ksgituser/getting-started/tags`
 
-app-image: `ksgituser/getting-started:rs-app-3`
+app-image: `ksgituser/getting-started:rs-app-2`
 
 db-image: `ksgituser/getting-started:rs-db`
 
