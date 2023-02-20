@@ -1,7 +1,9 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Album } from 'src/album/entities/album.entity';
+import { Artist } from 'src/artist/entities/artist.entity';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { favoriteId } from "./../helpers/consts"
-
+import { Track } from 'src/track/entities/track.entity';
+import { favoriteId } from './../helpers/consts';
 
 const DB_CATEGORY_NAMES = {
   album: 'albums',
@@ -25,7 +27,7 @@ export class FavoriteService {
         HttpStatus.UNPROCESSABLE_ENTITY,
       );
     }
-    const foundFavorite = this.prisma.favorite.findUnique({
+    const foundFavorite = await this.prisma.favorite.findUnique({
       where: { id: favoriteId },
     });
 
@@ -63,6 +65,14 @@ export class FavoriteService {
   async remove(categoryName: string, id: string) {
     if (!DB_CATEGORY_NAMES[categoryName]) {
       return new HttpException('Bad request', HttpStatus.BAD_REQUEST);
+    }
+
+    const favorite = await this.prisma.favorite.findUnique({
+      where: { id: favoriteId },
+      include: { [DB_CATEGORY_NAMES[categoryName]]: true },
+    });
+    if (!favorite || !(favorite?.[DB_CATEGORY_NAMES[categoryName]] as Album[] | Track[] | Artist[]).some((record) => record.id === id)) {
+      return;
     }
     return await this.prisma.favorite.update({
       where: { id: favoriteId },

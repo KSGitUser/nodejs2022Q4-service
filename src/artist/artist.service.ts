@@ -9,22 +9,16 @@ import { AlbumService } from '../album/album.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Prisma } from '@prisma/client';
 import { favoriteId } from 'src/helpers/consts';
+import { FavoriteService } from 'src/favorite/favorite.service';
 
 @Injectable()
 export class ArtistService {
   constructor(
     private prisma: PrismaService,
     private trackService: TrackService,
-    private albumService: AlbumService
+    private albumService: AlbumService,
+    private favoriteService: FavoriteService,
   ) {}
-  // create(createArtistDto: CreateArtistDto) {
-  //   return HelpersService.createDbRecord(
-  //     Artist,
-  //     this.db,
-  //     'artists',
-  //     createArtistDto,
-  //   );
-  // }
 
   async create(createArtistDto: CreateArtistDto) {
     try {
@@ -39,10 +33,6 @@ export class ArtistService {
     }
   }
 
-  // findAll(): Artist[] {
-  //   return Array.from(this.db.artists.values());
-  // }
-
   async findAll(params: {
     skip?: number;
     take?: number;
@@ -54,13 +44,6 @@ export class ArtistService {
     return await this.prisma.artist.findMany();
   }
 
-  // async findOne(id: Artist['id']): Promise<Artist> {
-  //   const foundData = await this.db.artists.get(id);
-  //   if (!foundData) {
-  //     throw new HttpException('Not found', HttpStatus.NOT_FOUND);
-  //   }
-  //   return foundData;
-  // }
 
   async findOne(
     id: Artist['id']
@@ -77,19 +60,6 @@ export class ArtistService {
     return doundDbRecord;
   }
 
-  // async update(id: Artist['id'], updateArtistDto: UpdateArtistDto) {
-  //   const foundData = await this.findOne(id);
-  //   if (!foundData) {
-  //     throw new HttpException('Not found', HttpStatus.NOT_FOUND);
-  //   }
-  //   const updatedData = HelpersService.updateData(
-  //     foundData,
-  //     updateArtistDto,
-  //     id,
-  //   );
-  //   this.db.artists.set(id, updatedData);
-  //   return updatedData;
-  // }
 
   async update(
     id: Artist['id'],
@@ -113,33 +83,6 @@ export class ArtistService {
     return updatedDbRecord;
   }
 
-  // async remove(id: Artist['id']) {
-  //   const foundData = await this.findOne(id);
-  //   if (!foundData) {
-  //     throw new HttpException('Not found', HttpStatus.NOT_FOUND);
-  //   }
-  //   const foundTrack = await this.db.findOneByParam<string>(
-  //     'artistId',
-  //     foundData.id,
-  //     'tracks',
-  //   );
-  //   if (foundTrack) {
-  //     await this.trackService.update(foundTrack.id, { artistId: null });
-  //   }
-  //   const foundAlbum = await this.db.findOneByParam<string>(
-  //     'artistId',
-  //     foundData.id,
-  //     'albums',
-  //   );
-  //   if (foundAlbum) {
-  //     await this.albumService.update(foundAlbum.id, { artistId: null });
-  //   }
-  //   const foundFavorite = await this.db.favorites.artists.get(id);
-  //   if (foundFavorite) {
-  //     this.db.favorites.artists.delete(id);
-  //   }
-  //   this.db.artists.delete(id);
-  // }
 
   async remove(id: Artist['id']):Promise<void> {
     const foundArtistRecord = await this.findOne(id);
@@ -165,14 +108,9 @@ export class ArtistService {
     if (foundAlbum) {
       await this.albumService.update(foundAlbum.id, { artistId: null });
     }
-    await this.prisma.favorite.update({
-      where: { id: favoriteId },
-      data: {
-        tracks: {
-          disconnect: { id: id },
-        },
-      },
-    });
+
+    await this.favoriteService.remove('artist', id);
+
     await  this.prisma.artist.delete({
       where: {id},
     });

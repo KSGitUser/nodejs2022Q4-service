@@ -1,19 +1,16 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateTrackDto } from './dto/create-track.dto';
-import { DataBaseService } from '../data-base/data-base.service';
 import { Track } from './entities/track.entity';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { HelpersService } from '../helpers/helpers.service';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { ArtistService } from 'src/artist/artist.service';
-import { AlbumService } from 'src/album/album.service';
-import { favoriteId } from "./../helpers/consts"
+import { FavoriteService } from 'src/favorite/favorite.service';
 
 @Injectable()
 export class TrackService {
   constructor(
-    private db: DataBaseService, 
     private prisma: PrismaService, 
+    private favoriteService: FavoriteService,
     ) {}
 
   async create(createTrackDto: CreateTrackDto):Promise<Track> {
@@ -55,22 +52,6 @@ export class TrackService {
     return fondTrack;
   }
 
-  // async update(
-  //   id: Track['id'],
-  //   updateTrackDto: UpdateTrackDto,
-  // ): Promise<Track> {
-  //   const foundTrack = await this.findOne(id);
-  //   if (!foundTrack) {
-  //     throw new HttpException('Not found', HttpStatus.NOT_FOUND);
-  //   }
-  //   const updatedData = HelpersService.updateData(
-  //     foundTrack,
-  //     updateTrackDto,
-  //     id,
-  //   );
-  //   this.db.tracks.set(id, { ...updatedData, id });
-  //   return updatedData;
-  // }
 
   async update(
     id: Track['id'],
@@ -101,31 +82,14 @@ export class TrackService {
     return updatedDbRecord;
   }
 
-  // async remove(id: Track['id']): Promise<void> {
-  //   const foundTrack = await this.findOne(id);
-  //   if (!foundTrack) {
-  //     throw new HttpException('Not found', HttpStatus.NOT_FOUND);
-  //   }
-  //   const foundFavorite = await this.db.favorites.tracks.get(id);
-  //   if (foundFavorite) {
-  //     this.db.favorites.tracks.delete(id);
-  //   }
-  //   this.db.tracks.delete(id);
-  // }
 
   async remove(id: Track['id']): Promise<void> {
     const foundTrack = await this.findOne(id);
     if (!foundTrack) {
       throw new HttpException('Not found', HttpStatus.NOT_FOUND);
     }
-    await this.prisma.favorite.update({
-      where: { id: favoriteId },
-      data: {
-        tracks: {
-          disconnect: { id: id },
-        },
-      },
-    });
+    await this.favoriteService.remove('favorite', id);
+
     await this.prisma.track.delete({where: {id}});
   }
 }

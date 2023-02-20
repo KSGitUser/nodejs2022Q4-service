@@ -4,9 +4,7 @@ networks:
 
 services:
   db:
-    build:
-      context: ./dockerfiles/db
-      dockerfile: Dockerfile
+    image: 'ksgituser/getting-started:rs-db'
     container_name: nodejs-rs-db  
     healthcheck:
       test: "exit 0" 

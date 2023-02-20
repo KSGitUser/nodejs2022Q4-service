@@ -8,6 +8,7 @@ import { HelpersService } from '../helpers/helpers.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Prisma } from '@prisma/client';
 import { favoriteId } from 'src/helpers/consts';
+import { FavoriteService } from 'src/favorite/favorite.service';
 
 @Injectable()
 export class AlbumService {
@@ -15,6 +16,7 @@ export class AlbumService {
     private prisma: PrismaService,
     private db: DataBaseService,
     private trackService: TrackService,
+    private favoriteService: FavoriteService
   ) {}
 
   async create(createAlbumDto: CreateAlbumDto) {
@@ -99,14 +101,7 @@ export class AlbumService {
     if (foundTrack) {
       await this.trackService.update(foundTrack.id, { albumId: null });
     }
-    await this.prisma.favorite.update({
-      where: { id: favoriteId },
-      data: {
-        tracks: {
-          disconnect: { id: id },
-        },
-      },
-    });
+    await this.favoriteService.remove('album', id);
     await this.prisma.album.delete({ where: {id}});
   }
 }
