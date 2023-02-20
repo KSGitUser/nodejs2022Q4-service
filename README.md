@@ -94,6 +94,11 @@ cp .env.exampe .env
 ```
 
 ## Docker, docker-compose
+To build app using two images from here: `https://hub.docker.com/r/ksgituser/getting-started/tags`
+
+app-image: `ksgituser/getting-started:rs-app-2`
+
+db-image: `ksgituser/getting-started:rs-db`
 
 To start APP using Docker be sure than docker desktop is running on your computer.
 After cloning repository and adding the `.env` file run the command
