@@ -26,7 +26,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    image: "ksgituser/getting-started:rs-app-2"
+    image: "ksgituser/getting-started:rs-app-3"
     container_name: nodejs-rs-server
     environment:
       PORT: ${PORT}
