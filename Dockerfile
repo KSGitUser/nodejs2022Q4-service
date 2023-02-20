@@ -21,6 +21,4 @@ FROM node:18-alpine
 COPY --from=build /app /app
 WORKDIR /app
 COPY . .
-RUN npm install -D prisma
-
-CMD ["npm", "run", "start:app"]
+RUN npm install -g prisma
