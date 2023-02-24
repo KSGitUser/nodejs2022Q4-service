@@ -9,6 +9,6 @@ import { FavoriteModule } from 'src/favorite/favorite.module';
   controllers: [AlbumController],
   providers: [AlbumService],
   exports: [AlbumService],
-  imports: [PrismaModule, FavoriteModule]
+  imports: [PrismaModule, FavoriteModule],
 })
 export class AlbumModule {}

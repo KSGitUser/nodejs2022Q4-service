@@ -37,7 +37,7 @@ export class ValidationPipe implements PipeTransform {
 
 @Injectable()
 export class ValidationNameParam implements PipeTransform {
-  method: string = '';
+  method = '';
   private readonly _possibleValues = ['track', 'album', 'artist'];
 
   constructor(data: { method: 'POST' | 'DELETE' }) {
@@ -45,7 +45,7 @@ export class ValidationNameParam implements PipeTransform {
       this.method = data.method;
     }
   }
-  transform(value: string, metadata: ArgumentMetadata) {
+  transform(value: string) {
     const isNamesIncludesValue = this._possibleValues.includes(value);
 
     if (!isNamesIncludesValue) {

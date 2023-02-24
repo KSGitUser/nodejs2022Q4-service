@@ -1,13 +1,12 @@
-import { ConsoleLogger, HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
 import { User as UseModel } from './entities/user.entity';
 import { HelpersService } from '../helpers/helpers.service';
 import { ForbiddenException } from '@nestjs/common/exceptions/forbidden.exception';
-import { PrismaService } from '../prisma/prisma.service'
-import { User, Prisma } from '@prisma/client';
+import { PrismaService } from '../prisma/prisma.service';
+import { User } from '@prisma/client';
 import { omit } from 'lodash';
-
 
 const USER_SELECT_FIELDS = {
   id: true,
@@ -15,17 +14,17 @@ const USER_SELECT_FIELDS = {
   version: true,
   createdAt: true,
   updatedAt: true,
-}
+};
 
 @Injectable()
 export class UserService {
   constructor(private prisma: PrismaService) {}
 
-  async create(data: CreateUserDto): Promise<Omit<User, "password">> {
+  async create(data: CreateUserDto): Promise<Omit<User, 'password'>> {
     try {
       const user = new UseModel(data);
       const createdUser = await this.prisma.user.create({
-        data: {...user, password: user.password },
+        data: { ...user, password: user.password },
       });
       return omit(createdUser, 'password');
     } catch (e) {
@@ -34,26 +33,17 @@ export class UserService {
     }
   }
 
-  async findAll(params: {
-    skip?: number;
-    take?: number;
-    cursor?: Prisma.UserWhereUniqueInput;
-    where?: Prisma.UserWhereInput;
-    orderBy?: Prisma.UserOrderByWithRelationInput;
-  }): Promise<Omit<User, 'password'>[]> {
-    const { skip, take, cursor, where, orderBy } = params;
-    return this.prisma.user.findMany({ select: USER_SELECT_FIELDS});
+  async findAll(): Promise<Omit<User, 'password'>[]> {
+    return this.prisma.user.findMany({ select: USER_SELECT_FIELDS });
   }
 
-  async findOne(
-    id: string
-  ): Promise<Omit<User, 'password'> | null> {
+  async findOne(id: string): Promise<Omit<User, 'password'> | null> {
     if (!HelpersService.isValidateUUID(id)) {
       throw new HttpException('Forbidden', HttpStatus.BAD_REQUEST);
     }
     const fondUser = await this.prisma.user.findUnique({
-      where: {id},
-      select: USER_SELECT_FIELDS
+      where: { id },
+      select: USER_SELECT_FIELDS,
     });
     if (!fondUser) {
       throw new HttpException('Not found', HttpStatus.NOT_FOUND);
@@ -61,26 +51,25 @@ export class UserService {
     return fondUser;
   }
 
-
   async update(
     id: string,
     updateUserDto: UpdateUserPasswordDto,
   ): Promise<Omit<User, 'password'>> {
     const foundUser = await this.prisma.user.findUnique({
-      where: {id},
+      where: { id },
     });
     if (!foundUser) {
       throw new HttpException('Not found', HttpStatus.NOT_FOUND);
     }
     if (updateUserDto.oldPassword !== foundUser.password) {
       throw new ForbiddenException('Wrong password');
-    };
+    }
     foundUser.password = updateUserDto.newPassword;
     foundUser.updatedAt = Date.now();
     foundUser.version += 1;
-    const updatedUser =  await this.prisma.user.update({
+    const updatedUser = await this.prisma.user.update({
       data: foundUser,
-      where: {id},
+      where: { id },
     });
 
     return omit(updatedUser, 'password');
@@ -92,7 +81,7 @@ export class UserService {
       throw new HttpException('Not found', HttpStatus.NOT_FOUND);
     }
     return this.prisma.user.delete({
-      where: {id},
+      where: { id },
     });
   }
 }
