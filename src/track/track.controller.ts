@@ -9,26 +9,31 @@ import {
   HttpStatus,
   Put,
   HttpCode,
+  UseGuards,
 } from '@nestjs/common';
 import { TrackService } from './track.service';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { ValidationPipe } from '../pipes/validator.pipe';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('track')
 export class TrackController {
   constructor(private readonly TracksService: TrackService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post()
   create(@Body(new ValidationPipe()) createTrackDto: CreateTrackDto) {
     return this.TracksService.create(createTrackDto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get()
   findAll() {
     return this.TracksService.findAll();
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   findOne(
     @Param(
@@ -43,6 +48,7 @@ export class TrackController {
     return this.TracksService.findOne(id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Put(':id')
   update(
     @Param(
@@ -58,6 +64,7 @@ export class TrackController {
     return this.TracksService.update(id, updateTrackDto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   @HttpCode(204)
   remove(
