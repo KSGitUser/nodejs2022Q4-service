@@ -51,6 +51,16 @@ export class UserService {
     return fondUser;
   }
 
+  async findOneByLogin(login: string): Promise<User | null> {
+    return await this.prisma.user.findFirst({
+      where: {
+        login: {
+          equals: login,
+        },
+      },
+    });
+  }
+
   async update(
     id: string,
     updateUserDto: UpdateUserPasswordDto,
