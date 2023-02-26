@@ -22,6 +22,7 @@ const USER_SELECT_FIELDS = {
   version: true,
   createdAt: true,
   updatedAt: true,
+  refreshToken: true,
 };
 
 @Injectable()
@@ -55,7 +56,7 @@ export class UserService {
 
   async findOne(
     id: string,
-  ): Promise<Omit<User, 'password' | 'refreshToken' | 'accessToken'> | null> {
+  ): Promise<Omit<User, 'password' | 'accessToken'> | null> {
     if (!HelpersService.isValidateUUID(id)) {
       throw new HttpException('Forbidden', HttpStatus.BAD_REQUEST);
     }

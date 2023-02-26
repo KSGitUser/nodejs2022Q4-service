@@ -3,6 +3,7 @@ import {
   forwardRef,
   Inject,
   Injectable,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
@@ -99,5 +100,18 @@ export class AuthService {
       tokens.accessToken,
     );
     return updatedUser;
+  }
+
+  async refreshTokens(userId: string, refreshToken: string, expired: number) {
+    const user = await this.userService.findOne(userId);
+    if (!user || !user.refreshToken)
+      throw new UnauthorizedException('Access Denied');
+    const refreshTokenMatches = user.refreshToken === refreshToken;
+    const isExpired = expired * 1000 < Date.now();
+    if (!refreshTokenMatches || isExpired)
+      throw new ForbiddenException('Access Denied');
+    const tokens = await this.getTokens(user.id, user.login);
+    await this.updateRefreshToken(user.id, tokens.refreshToken);
+    return tokens;
   }
 }
