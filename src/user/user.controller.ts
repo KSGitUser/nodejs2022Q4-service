@@ -60,7 +60,8 @@ export class UserController {
       }),
     )
     id: string,
-    @Body(new ValidationPipe()) updateUserPasswordDto: UpdateUserPasswordDto,
+    @Body(new ValidationPipe())
+    updateUserPasswordDto: Omit<UpdateUserPasswordDto, 'refreshToken'>,
   ) {
     return this.usersService.update(id, updateUserPasswordDto);
   }

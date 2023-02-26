@@ -122,5 +122,16 @@ To check vulnerabilities run command
 npm audit
 ```
 
+### Authentication
+To test authentication run 
+```
+npm run test:auth
+```
+
+All routes except `auth/login, auth/sinup, /` will work only with Authorization header with jwt token
+```html
+Authorization: Bearer <accessToken>
+```
+
 
 

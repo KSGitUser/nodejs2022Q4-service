@@ -27,7 +27,8 @@
     "generate:prisma": "npx prisma migrate deploy && npx prisma generate",
     "generate:prisma-dev": "npx prisma migrate dev --name init && npx prisma generate",
     "start:app": "npm run generate:prisma && npm run start:dev",
-    "audit": "npx audit"
+    "audit": "npx audit",
+    "db:dev-reset": "npx prisma migrate reset"
   },
   "dependencies": {
     "@nestjs/common": "^9.3.9",
@@ -40,6 +41,7 @@
     "@nestjs/typeorm": "^9.0.1",
     "@prisma/client": "^4.10.1",
     "@types/lodash": "^4.14.191",
+    "argon2": "^0.30.3",
     "bcrypt": "^5.0.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
