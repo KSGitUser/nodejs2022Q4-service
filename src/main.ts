@@ -6,6 +6,8 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 const port = process.env.PORT || 4000;
 
+console.log(`The connection URL is ${process.env.DATABASE_URL}`)
+
 const messageOnServerStart = `\x1b[33mThe Server was started at http://localhost:${port} \x1b[0m`;
 
 async function bootstrap() {

@@ -86,4 +86,41 @@ For more information, visit: https://code.visualstudio.com/docs/editor/debugging
 ### Swagger - API
 On address http://localhost:4000/swagger/, after start server, you can try and see swagger for API
 
+### Db
+
+All envirenments should be in `.env` file. You should use `.env.exampe` - rename in or use a command
+```
+cp .env.exampe .env
+```
+
+## Docker, docker-compose
+To build app using two images from here: `https://hub.docker.com/r/ksgituser/getting-started/tags`
+
+app-image: `ksgituser/getting-started:rs-app-2`
+
+db-image: `ksgituser/getting-started:rs-db`
+
+To start APP using Docker be sure than docker desktop is running on your computer.
+After cloning repository and adding the `.env` file run the command
+
+```
+docker-compose up
+```
+
+Server by default will start on `4000` port 
+Wait until you see 
+`nodejs-rs-server  | The Server was started at http://localhost:4000 `
+You can check API using command 
+```
+npm run test
+```
+
+### Check Vulnerabilities
+To check vulnerabilities run command
+
+```
+npm audit
+```
+
+
 
