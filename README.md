@@ -155,6 +155,12 @@ Make sure еру Docker Desktop is running locally. Create images and start cont
 ```shell
 docker compose up
 ```
+After app have been started and you see `The Server was started at http://localhost:4000` open 
+new terminal on current directory and run test
+
+```shell
+npm run test:auth
+```
 
 
 
