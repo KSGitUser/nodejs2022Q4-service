@@ -122,6 +122,16 @@ To check vulnerabilities run command
 npm audit
 ```
 
+### Logger
+Add `.env` variable `LOG_LEVEL`
+depending on log level shows different messages
+```shell
+1 - INFO,
+2 - WARN,
+3 - ERROR
+```
+and `0` switch off logger
+
 ### Authentication
 To test authentication run 
 ```
