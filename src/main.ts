@@ -4,6 +4,7 @@ import { ValidationPipe } from '@nestjs/common';
 import 'dotenv/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { CustomLogger } from './logger/custom-logger.service';
+import { HttpExceptionFilter } from './exceptions/exceptions.filter';
 
 const port = process.env.PORT || 4000;
 
@@ -16,7 +17,7 @@ async function bootstrap() {
     bufferLogs: true,
   });
   app.useLogger(app.get(CustomLogger));
-
+  app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
