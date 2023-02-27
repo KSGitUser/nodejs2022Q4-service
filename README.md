@@ -132,6 +132,29 @@ All routes except `auth/login, auth/sinup, /` will work only with Authorization 
 ```html
 Authorization: Bearer <accessToken>
 ```
+### Authorization run tests
+Copy repository:
+
+```shell
+git clone https://github.com/KSGitUser/nodejs2022Q4-service.git
+```
+
+Change folder:
+```shell
+cd nodejs2022Q4-service
+```
+Change branch:
+```shell
+git switch task-8/auth-logging
+```
+Create `.env` file from `.env.example` or you can create your own:
+```shell
+cp .env.example .env
+```
+Make sure еру Docker Desktop is running locally. Create images and start containers with app and db:
+```shell
+docker compose up
+```
 
 
 
