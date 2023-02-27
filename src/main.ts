@@ -27,6 +27,14 @@ async function bootstrap() {
     }),
   );
 
+  process.on('uncaughtException', (error: Error) => {
+    customLogger.error(error);
+  });
+
+  process.on('unhandledRejection', (error) => {
+    customLogger.error(error);
+  });
+
   const config = new DocumentBuilder()
     .setTitle('Home library')
     .setDescription('Rest API for home library')
