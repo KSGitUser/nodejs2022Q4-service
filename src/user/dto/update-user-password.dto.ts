@@ -5,10 +5,15 @@ export class UpdateUserPasswordDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  oldPassword: string;
+  oldPassword?: string;
 
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  newPassword: string;
+  newPassword?: string;
+
+  @IsString()
+  refreshToken?: string;
+
+  accessToken?: string;
 }

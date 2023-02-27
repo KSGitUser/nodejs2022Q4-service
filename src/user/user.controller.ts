@@ -9,27 +9,32 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
 import { ValidationPipe } from '../pipes/validator.pipe';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly usersService: UserService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post()
   @HttpCode(201)
   create(@Body(new ValidationPipe()) createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get()
   findAll() {
-    return this.usersService.findAll({});
+    return this.usersService.findAll();
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   findOne(
     @Param(
@@ -44,6 +49,7 @@ export class UserController {
     return this.usersService.findOne(id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Put(':id')
   update(
     @Param(
@@ -54,11 +60,13 @@ export class UserController {
       }),
     )
     id: string,
-    @Body(new ValidationPipe()) updateUserPasswordDto: UpdateUserPasswordDto,
+    @Body(new ValidationPipe())
+    updateUserPasswordDto: Omit<UpdateUserPasswordDto, 'refreshToken'>,
   ) {
     return this.usersService.update(id, updateUserPasswordDto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   @HttpCode(204)
   remove(

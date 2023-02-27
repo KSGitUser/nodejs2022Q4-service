@@ -6,8 +6,6 @@ import { Album } from './entities/album.entity';
 import { TrackService } from '../track/track.service';
 import { HelpersService } from '../helpers/helpers.service';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Prisma } from '@prisma/client';
-import { favoriteId } from 'src/helpers/consts';
 import { FavoriteService } from 'src/favorite/favorite.service';
 
 @Injectable()
@@ -16,44 +14,38 @@ export class AlbumService {
     private prisma: PrismaService,
     private db: DataBaseService,
     private trackService: TrackService,
-    private favoriteService: FavoriteService
+    private favoriteService: FavoriteService,
   ) {}
 
   async create(createAlbumDto: CreateAlbumDto) {
     try {
       let foundArtist;
       if (createAlbumDto.artistId) {
-        foundArtist = await this.prisma.artist.findUnique({where: {
-          id: createAlbumDto.artistId
-        }
-      });
-      if (!foundArtist?.id) {
+        foundArtist = await this.prisma.artist.findUnique({
+          where: {
+            id: createAlbumDto.artistId,
+          },
+        });
+        if (!foundArtist?.id) {
           createAlbumDto.artistId = null;
         }
       }
       const createdAlbum = new Album(createAlbumDto);
       const createdDbRecord = await this.prisma.album.create({
-        data: {...createdAlbum },
-      });;
+        data: { ...createdAlbum },
+      });
       return createdDbRecord;
     } catch (e) {
       throw new HttpException('Bad request', HttpStatus.BAD_REQUEST);
     }
   }
 
-  async findAll(params: {
-    skip?: number;
-    take?: number;
-    cursor?: Prisma.UserWhereUniqueInput;
-    where?: Prisma.UserWhereInput;
-    orderBy?: Prisma.UserOrderByWithRelationInput;
-  }): Promise<Album[]> {
-    const { skip, take, cursor, where, orderBy } = params;
+  async findAll(): Promise<Album[]> {
     return await this.prisma.album.findMany();
   }
 
   async findOne(id: Album['id']): Promise<Album> {
-    const fondAlbum = await this.prisma.album.findUnique({where: {id}});
+    const fondAlbum = await this.prisma.album.findUnique({ where: { id } });
     if (!fondAlbum) {
       throw new HttpException('Not found', HttpStatus.NOT_FOUND);
     }
@@ -69,12 +61,13 @@ export class AlbumService {
       throw new HttpException('Not found', HttpStatus.NOT_FOUND);
     }
     if (updateAlbumDto.artistId) {
-      const foundArtist = await this.prisma.artist.findUnique({where: {
-        id: updateAlbumDto.artistId
-      }
-    });
-    if (!foundArtist?.id) {
-      updateAlbumDto.artistId = null;
+      const foundArtist = await this.prisma.artist.findUnique({
+        where: {
+          id: updateAlbumDto.artistId,
+        },
+      });
+      if (!foundArtist?.id) {
+        updateAlbumDto.artistId = null;
       }
     }
     const updatedData = HelpersService.updateData(
@@ -82,7 +75,10 @@ export class AlbumService {
       updateAlbumDto,
       id,
     );
-    const updatedDbRecord = this.prisma.album.update({ where: {id}, data: updatedData});
+    const updatedDbRecord = this.prisma.album.update({
+      where: { id },
+      data: updatedData,
+    });
     return updatedDbRecord;
   }
 
@@ -94,14 +90,14 @@ export class AlbumService {
     const foundTrack = await this.prisma.track.findFirst({
       where: {
         albumId: {
-          equals: foundData.id
-        }
-      }
+          equals: foundData.id,
+        },
+      },
     });
     if (foundTrack) {
       await this.trackService.update(foundTrack.id, { albumId: null });
     }
     await this.favoriteService.remove('album', id);
-    await this.prisma.album.delete({ where: {id}});
+    await this.prisma.album.delete({ where: { id } });
   }
 }

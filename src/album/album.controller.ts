@@ -9,26 +9,31 @@ import {
   HttpStatus,
   Put,
   HttpCode,
+  UseGuards,
 } from '@nestjs/common';
 import { AlbumService } from './album.service';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import { ValidationPipe } from '../pipes/validator.pipe';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('album')
 export class AlbumController {
   constructor(private readonly albumService: AlbumService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post()
   create(@Body(new ValidationPipe()) createAlbumDto: CreateAlbumDto) {
     return this.albumService.create(createAlbumDto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get()
   findAll() {
-    return this.albumService.findAll({});
+    return this.albumService.findAll();
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   findOne(
     @Param(
@@ -43,6 +48,7 @@ export class AlbumController {
     return this.albumService.findOne(id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Put(':id')
   update(
     @Param(
@@ -58,6 +64,7 @@ export class AlbumController {
     return this.albumService.update(id, updateAlbumDto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   @HttpCode(204)
   remove(

@@ -122,5 +122,55 @@ To check vulnerabilities run command
 npm audit
 ```
 
+### Logger
+Add `.env` variable `LOG_LEVEL`
+depending on log level shows different messages
+```shell
+1 - INFO,
+2 - WARN,
+3 - ERROR
+```
+and `0` switch off logger
+
+### Authentication
+To test authentication run 
+```
+npm run test:auth
+```
+
+All routes except `auth/login, auth/sinup, /` will work only with Authorization header with jwt token
+```html
+Authorization: Bearer <accessToken>
+```
+### Authorization run tests
+Copy repository:
+
+```shell
+git clone https://github.com/KSGitUser/nodejs2022Q4-service.git
+```
+
+Change folder:
+```shell
+cd nodejs2022Q4-service
+```
+Change branch:
+```shell
+git switch task-8/auth-logging
+```
+Create `.env` file from `.env.example` or you can create your own:
+```shell
+cp .env.example .env
+```
+Make sure еру Docker Desktop is running locally. Create images and start containers with app and db:
+```shell
+docker compose up
+```
+After app have been started and you see `The Server was started at http://localhost:4000` open 
+new terminal on current directory and run test
+
+```shell
+npm run test:auth
+```
+
 
 

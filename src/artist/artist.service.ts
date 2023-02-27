@@ -2,13 +2,10 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
 import { Artist } from './entities/artist.entity';
-import { DataBaseService } from '../data-base/data-base.service';
 import { HelpersService } from '../helpers/helpers.service';
 import { TrackService } from '../track/track.service';
 import { AlbumService } from '../album/album.service';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Prisma } from '@prisma/client';
-import { favoriteId } from 'src/helpers/consts';
 import { FavoriteService } from 'src/favorite/favorite.service';
 
 @Injectable()
@@ -24,7 +21,7 @@ export class ArtistService {
     try {
       const classInstance = new Artist(createArtistDto);
       const createdDbRecord = await this.prisma.artist.create({
-        data: {...classInstance },
+        data: { ...classInstance },
       });
       return createdDbRecord;
     } catch (e) {
@@ -33,26 +30,16 @@ export class ArtistService {
     }
   }
 
-  async findAll(params: {
-    skip?: number;
-    take?: number;
-    cursor?: Prisma.UserWhereUniqueInput;
-    where?: Prisma.UserWhereInput;
-    orderBy?: Prisma.UserOrderByWithRelationInput;
-  }): Promise<Artist[]> {
-    const { skip, take, cursor, where, orderBy } = params;
+  async findAll(): Promise<Artist[]> {
     return await this.prisma.artist.findMany();
   }
 
-
-  async findOne(
-    id: Artist['id']
-  ): Promise<Artist | null> {
+  async findOne(id: Artist['id']): Promise<Artist | null> {
     if (!HelpersService.isValidateUUID(id)) {
       throw new HttpException('Forbidden', HttpStatus.BAD_REQUEST);
     }
     const doundDbRecord = await this.prisma.artist.findUnique({
-      where: {id},
+      where: { id },
     });
     if (!doundDbRecord) {
       throw new HttpException('Not found', HttpStatus.NOT_FOUND);
@@ -60,13 +47,12 @@ export class ArtistService {
     return doundDbRecord;
   }
 
-
   async update(
     id: Artist['id'],
     updateArtistDto: UpdateArtistDto,
   ): Promise<Artist> {
     const foundDbRecord = await this.prisma.artist.findUnique({
-      where: {id},
+      where: { id },
     });
     if (!foundDbRecord) {
       throw new HttpException('Not found', HttpStatus.NOT_FOUND);
@@ -76,43 +62,43 @@ export class ArtistService {
       updateArtistDto,
       id,
     );
-    const updatedDbRecord =  await this.prisma.artist.update({
+    const updatedDbRecord = await this.prisma.artist.update({
       data: updatedData,
-      where: {id},
+      where: { id },
     });
     return updatedDbRecord;
   }
 
-
-  async remove(id: Artist['id']):Promise<void> {
+  async remove(id: Artist['id']): Promise<void> {
     const foundArtistRecord = await this.findOne(id);
     if (!foundArtistRecord) {
       throw new HttpException('Not found', HttpStatus.NOT_FOUND);
     }
     const foundTrack = await this.prisma.track.findFirst({
-      where: { artistId: {
-        equals: foundArtistRecord.id,
-      }},
-    })
+      where: {
+        artistId: {
+          equals: foundArtistRecord.id,
+        },
+      },
+    });
     if (foundTrack) {
       await this.trackService.update(foundTrack.id, { artistId: null });
     }
-        const foundAlbum = await this.prisma.album.findFirst
-        (
-          {
-            where: { artistId: {
-              equals: foundArtistRecord.id,
-            }},
-          }
-    );
+    const foundAlbum = await this.prisma.album.findFirst({
+      where: {
+        artistId: {
+          equals: foundArtistRecord.id,
+        },
+      },
+    });
     if (foundAlbum) {
       await this.albumService.update(foundAlbum.id, { artistId: null });
     }
 
     await this.favoriteService.remove('artist', id);
 
-    await  this.prisma.artist.delete({
-      where: {id},
+    await this.prisma.artist.delete({
+      where: { id },
     });
   }
 }

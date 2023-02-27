@@ -1,4 +1,3 @@
-import { CreateUserDto } from '../dto/create-user.dto';
 import { HelpersService } from '../../helpers/helpers.service';
 import { Prisma } from '@prisma/client';
 
@@ -24,29 +23,4 @@ export class User {
       enumerable: false,
     });
   }
-
-  // set createdAt(value: Date | string) {
-  //   this.#createdAt = !!value ? new Date(value) : new Date();
-  // }
-
-  // get createdAt():string {
-  //   return (this.#createdAt || new Date()).getTime() + '';
-  // }
-
-  // set updatedAt(value: Date | string) {
-  //   this.#updatedAt =  !!value ? new Date(value) : new Date();
-  // }
-
-  // get updatedAt():string {
-  //   return (this.#updatedAt || new Date()).getTime() + '';
-  // }
-
-  // get createdAtDate():Date {
-  //   return new Date(this.#createdAt)
-  // }
-
-  // get updatedAtDate():Date {
-  //   return new Date(this.#updatedAt)
-  // }
-
 }

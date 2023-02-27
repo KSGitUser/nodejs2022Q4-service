@@ -3,20 +3,37 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import 'dotenv/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { CustomLogger } from './logger/custom-logger.service';
+import { HttpExceptionFilter } from './exceptions/exceptions.filter';
+import { AllExceptionsFilter } from './all-errors/all-errors.filter';
 
 const port = process.env.PORT || 4000;
 
-console.log(`The connection URL is ${process.env.DATABASE_URL}`)
+console.log(`The connection URL is ${process.env.DATABASE_URL}`);
 
 const messageOnServerStart = `\x1b[33mThe Server was started at http://localhost:${port} \x1b[0m`;
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    bufferLogs: true,
+  });
+  const customLogger = app.get(CustomLogger);
+  app.useLogger(customLogger);
+  app.useGlobalFilters(new AllExceptionsFilter(customLogger));
+  app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
     }),
   );
+
+  process.on('uncaughtException', (error: Error) => {
+    customLogger.error(error);
+  });
+
+  process.on('unhandledRejection', (error) => {
+    customLogger.error(error);
+  });
 
   const config = new DocumentBuilder()
     .setTitle('Home library')
