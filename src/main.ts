@@ -5,6 +5,7 @@ import 'dotenv/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { CustomLogger } from './logger/custom-logger.service';
 import { HttpExceptionFilter } from './exceptions/exceptions.filter';
+import { AllExceptionsFilter } from './all-errors/all-errors.filter';
 
 const port = process.env.PORT || 4000;
 
@@ -16,7 +17,9 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     bufferLogs: true,
   });
-  app.useLogger(app.get(CustomLogger));
+  const customLogger = app.get(CustomLogger);
+  app.useLogger(customLogger);
+  app.useGlobalFilters(new AllExceptionsFilter(customLogger));
   app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalPipes(
     new ValidationPipe({
