@@ -8,7 +8,7 @@ import {
 import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from '../user/dto/create-user.dto';
-import * as argon2 from 'argon2';
+import * as bcrypt from 'bcrypt';
 import { ForbiddenException } from '@nestjs/common/exceptions/forbidden.exception';
 
 @Injectable()
@@ -18,8 +18,9 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  hashData(data: string) {
-    return argon2.hash(data);
+  async hashData(data: string) {
+    const salt = await bcrypt.genSalt(+process.env.CRYPT_SALT);
+    return bcrypt.hash(data, salt);
   }
 
   async getTokens(userId: string, login: string) {
@@ -90,7 +91,7 @@ export class AuthService {
   async signIn(data: { login: string; password: string }) {
     const user = await this.userService.findOneByLogin(data.login);
     if (!user) throw new ForbiddenException('Wrong login or password');
-    const passwordMatches = await argon2.verify(user.password, data.password);
+    const passwordMatches = await bcrypt.compare(data.password, user.password);
     if (!passwordMatches)
       throw new ForbiddenException('Wrong login or password');
     const tokens = await this.getTokens(user.id, user.login);

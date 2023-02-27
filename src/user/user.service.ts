@@ -12,7 +12,7 @@ import { HelpersService } from '../helpers/helpers.service';
 import { ForbiddenException } from '@nestjs/common/exceptions/forbidden.exception';
 import { PrismaService } from '../prisma/prisma.service';
 import { User } from '@prisma/client';
-import * as argon2 from 'argon2';
+import * as bcrypt from 'bcrypt';
 import { omit } from 'lodash';
 import { AuthService } from '../auth/auth.service';
 
@@ -97,15 +97,14 @@ export class UserService {
       throw new HttpException('Not found', HttpStatus.NOT_FOUND);
     }
     try {
-      const passwordMatches = await argon2.verify(
-        foundUser.password,
+      const passwordMatches = await bcrypt.compare(
         updateUserDto.oldPassword,
+        foundUser.password,
       );
       if (!passwordMatches) {
         throw new ForbiddenException('Wrong password');
       }
     } catch (e) {
-      console.error(e);
       throw new ForbiddenException('Wrong password');
     }
 

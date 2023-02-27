@@ -1,4 +1,4 @@
-FROM node:18-alpine as build
+FROM node:18 as build
 
 WORKDIR /app
 
@@ -6,16 +6,15 @@ COPY package*.json ./
 
 COPY .npmrc .
 
-#Was a lot of errors SOCKET TIMEOUT - that's why I use next commands
-
-RUN set -eux; apk add curl;
-
-RUN npm config set fetch-retries 5
-RUN npm config set fetch-retry-mintimeout 600000
-RUN npm config set fetch-retry-maxtimeout 1200000
-RUN npm config set fetch-timeout 1800000
-
-RUN npm ci --maxsockets 4
+RUN npm ci
+RUN npm rebuild bcrypt --build-from-source
 
 COPY . .
-# RUN npm install -g prisma
+RUN npm install -g prisma
+RUN npm install -g rimraf
+RUN npm install -g @nestjs/cli
+RUN npm install -g node-gyp
+RUN npm install bcrypt
+#CMD ["npm", "run", "start:dev"]
+#RUN bash -c "cp .env.example .env"
+#RUN bash -c "npm run generate:prisma && npm run build && npm run && npm run start"
